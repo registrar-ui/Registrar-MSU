@@ -26,6 +26,11 @@ const plexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: "Office of the University Registrar — MSU Naawan",
+   icons: {
+    icon: "/Logos.png",
+    shortcut: "/Logos.png",
+    apple: "/Logos.png",
+  },
   description:
     "Office of the University Registrar, Mindanao State University at Naawan — document requests, verification, and student records.",
 };
