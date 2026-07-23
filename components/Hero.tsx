@@ -152,7 +152,7 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.25 }}
           className="relative"
         >
-         {/*  <motion.div
+          {/* <motion.div
             animate={{ y: [0, -10, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
             className="glass rounded-3xl p-5 shadow-2xl max-w-md mx-auto relative z-10"
@@ -197,8 +197,8 @@ export default function Hero() {
                 Verified
               </span>
             </div>
-          </motion.div>
- */}
+          </motion.div> */}
+
           {/* signature seal */}
           <div className="absolute -bottom-8 -left-8 w-32 h-32 z-20 hidden sm:block drop-shadow-[0_18px_34px_rgba(15,37,87,0.35)]">
             <motion.svg

@@ -1,11 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ScrollText, Award, LayoutDashboard, ArrowRight, X } from "lucide-react";
+import { ScrollText, Award, LayoutDashboard, ArrowRight, X, type LucideIcon } from "lucide-react";
 import Reveal from "./Reveal";
 
-const POSTS = [
+type Post = {
+  date: string;
+  category: string;
+  title: string;
+  body: string;
+  icon: LucideIcon;
+  from: string;
+  to: string;
+  /** Optional: path to an image in /public, e.g. "/images/announcements/enrollment.jpg".
+   *  Drop your photo in public/images/announcements/ and point this at it.
+   *  Leave empty to fall back to the icon + gradient background. */
+  image?: string;
+};
+
+const POSTS: Post[] = [
   {
     date: "Aug 12, 2026",
     category: "Enrollment",
@@ -13,6 +28,7 @@ const POSTS = [
     icon: ScrollText,
     from: "from-[var(--color-royal)]",
     to: "to-[var(--color-royal-deep)]",
+    image: "/logos.png",
     body: "The Office of the University Registrar has released the official enrollment schedule for the Second Semester, AY 2026–2027. Continuing students are advised to check their assigned enrollment dates through the Student Portal and to settle any outstanding balances beforehand to avoid delays. Late enrollees will be accommodated on a walk-in basis starting the second week of classes, subject to the usual late enrollment fees. For questions about your specific schedule or block assignment, please reach out through the Contact section below.",
   },
   {
@@ -22,18 +38,35 @@ const POSTS = [
     icon: Award,
     from: "from-[var(--color-royal-mid)]",
     to: "to-[var(--color-royal)]",
+    image: "/logos.png",
     body: "Candidates for graduation may now process their clearance through the Online Request System or in person at the Registrar's Office. Please secure clearance from all relevant departments — Library, Accounting, Guidance, and your College — before submitting your final clearance form. The deadline for clearance submission is three weeks before the scheduled commencement exercises. Incomplete clearances will not be processed for diploma release.",
   },
   {
-    date: "Jul 15, 2026",
-    category: "System",
-    title: "Online request portal maintenance schedule",
+    date: "June 21, 2026",
+    category: "Examination",
+    title: "CET 2026",
     icon: LayoutDashboard,
     from: "from-[var(--color-royal-deep)]",
     to: "to-[var(--color-royal-mid)]",
-    body: "The Online Request System will undergo scheduled maintenance to improve document processing and tracking speed. During this window, new requests cannot be submitted, but previously submitted requests will continue to be processed normally. We apologize for any inconvenience and recommend submitting time-sensitive requests ahead of the maintenance period. Updates will be posted here and on the office's official Facebook page.",
+    image: "/CET.jpg",
+    body: "CET 2026 Conducted on June CfsjdgEFGdfhGssdGhSFDHSDFGhmngfbzzvzsfdghjnfbVXZDSGnbzASFDFhbv",
   },
 ];
+
+function Thumbnail({ post, sizes }: { post: Post; sizes: string }) {
+  if (post.image) {
+    return (
+      <div className="relative w-full h-full">
+        <Image src={post.image} alt={post.title} fill sizes={sizes} className="object-cover" />
+      </div>
+    );
+  }
+  return (
+    <div className={`w-full h-full bg-gradient-to-br ${post.from} ${post.to} flex items-center justify-center`}>
+      <post.icon size={40} color="#FBBF24" strokeWidth={1.6} />
+    </div>
+  );
+}
 
 export default function Announcements() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -69,9 +102,23 @@ export default function Announcements() {
         <div className="grid md:grid-cols-3 gap-8">
           {POSTS.map((p, i) => (
             <Reveal key={p.title} delay={i * 90}>
-              <motion.article whileHover={{ y: -8 }} transition={{ duration: 0.3 }} className="grad-border overflow-hidden h-full">
-                <div className={`h-40 bg-gradient-to-br ${p.from} ${p.to} flex items-center justify-center`}>
-                  <p.icon size={40} color="#FBBF24" strokeWidth={1.6} />
+              <motion.div
+                whileHover={{ y: -8 }}
+                transition={{ duration: 0.3 }}
+                role="button"
+                tabIndex={0}
+                aria-label={`Read more: ${p.title}`}
+                onClick={() => setActiveIndex(i)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setActiveIndex(i);
+                  }
+                }}
+                className="group grad-border overflow-hidden h-full cursor-pointer text-left"
+              >
+                <div className="h-40 relative">
+                  <Thumbnail post={p} sizes="(max-width: 768px) 100vw, 33vw" />
                 </div>
                 <div className="p-6">
                   <div className="flex items-center gap-3 text-[11.5px] text-[var(--color-ink-soft)] font-medium mb-3">
@@ -80,15 +127,12 @@ export default function Announcements() {
                     <span className="text-[var(--color-gold-deep)]">{p.category}</span>
                   </div>
                   <h3 className="font-semibold text-[var(--color-ink)] mb-3 leading-snug">{p.title}</h3>
-                  <button
-                    onClick={() => setActiveIndex(i)}
-                    className="text-sm font-semibold text-[var(--color-royal)] inline-flex items-center gap-1.5 group"
-                  >
+                  <span className="text-sm font-semibold text-[var(--color-royal)] inline-flex items-center gap-1.5">
                     Read More
                     <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-                  </button>
+                  </span>
                 </div>
-              </motion.article>
+              </motion.div>
             </Reveal>
           ))}
         </div>
@@ -114,12 +158,12 @@ export default function Announcements() {
               className="relative bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className={`h-40 bg-gradient-to-br ${active.from} ${active.to} flex items-center justify-center relative`}>
-                <active.icon size={44} color="#FBBF24" strokeWidth={1.6} />
+              <div className="h-56 relative">
+                <Thumbnail post={active} sizes="512px" />
                 <button
                   onClick={() => setActiveIndex(null)}
                   aria-label="Close"
-                  className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white transition-colors"
+                  className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/25 hover:bg-black/40 flex items-center justify-center text-white transition-colors"
                 >
                   <X size={18} />
                 </button>

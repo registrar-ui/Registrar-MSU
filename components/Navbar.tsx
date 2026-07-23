@@ -8,7 +8,7 @@ import Image from "next/image";
 const LINKS = [
   { label: "Home", href: "#home" },
   // { label: "About", href: "#about" },
-  // { label: "Services", href: "#services" },
+  { label: "Services", href: "#services" },
   // { label: "Online Requests", href: "#requests" },
   // { label: "Download Forms", href: "#downloads" },
   { label: "Announcements", href: "#announcements" },
