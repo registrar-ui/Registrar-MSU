@@ -48,6 +48,8 @@ export default function Navbar() {
                   height="48"
                 />
           </svg>
+
+        
           <span className="font-display text-white font-semibold leading-tight text-sm md:text-base">
             MSU Naawan
             <br className="hidden sm:block" />

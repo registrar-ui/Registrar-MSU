@@ -200,7 +200,7 @@ export default function Hero() {
           </motion.div> */}
 
           {/* signature seal */}
-          <div className="absolute -bottom-8 -left-8 w-32 h-32 z-20 hidden sm:block drop-shadow-[0_18px_34px_rgba(15,37,87,0.35)]">
+          <div className="absolute -bottom-8 -left-8 w-38 h-38 z-20 hidden sm:block drop-shadow-[0_18px_34px_rgba(15,37,87,0.35)]">
             <motion.svg
               viewBox="0 0 200 200"
               className="w-full h-full"
