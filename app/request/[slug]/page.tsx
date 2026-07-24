@@ -42,7 +42,7 @@ export default async function RequestPage({
           </h1>
         </div>
       </div>
-      <div className="p-10 text-center">Test — doc found: {doc.title}</div>
+      <RequestWizard slug={slug} />
     </main>
   );
 }
