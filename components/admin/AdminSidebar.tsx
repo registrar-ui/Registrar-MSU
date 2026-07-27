@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Megaphone,
@@ -11,8 +11,6 @@ import {
   LogOut,
   X,
 } from "lucide-react";
-import { logout } from "@/lib/auth";
-import { useRouter } from "next/navigation";
 
 const navItems = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -32,9 +30,10 @@ export default function AdminSidebar({
   const pathname = usePathname();
   const router = useRouter();
 
-  function handleLogout() {
-    logout();
+  async function handleLogout() {
+    await fetch("/api/auth/logout", { method: "POST" });
     router.push("/admin/login");
+    router.refresh();
   }
 
   return (
@@ -56,13 +55,7 @@ export default function AdminSidebar({
         <div className="flex items-center justify-between px-6 py-6 border-b border-white/10">
           <div className="flex items-center gap-3">
             <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
-            <image
-                  href="/Logos.png"
-                  x="0"
-                  y="0"
-                  width="48"
-                  height="48"
-                />
+              <image href="/Logos.png" x="0" y="0" width="48" height="48" />
             </svg>
             <div className="leading-tight">
               <p className="font-display font-semibold text-white text-sm">MSU Naawan</p>

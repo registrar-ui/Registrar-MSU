@@ -4,7 +4,6 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff, ShieldCheck, ArrowRight } from "lucide-react";
-import { mockLogin } from "@/lib/auth";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -15,21 +14,31 @@ export default function AdminLoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
-    // Simulated network delay for now — replace with a real API call later.
-    setTimeout(() => {
-      const ok = mockLogin(email, password);
-      setLoading(false);
-      if (ok) {
-        router.push("/admin/dashboard");
-      } else {
-        setError("Invalid email or password. Password must be at least 6 characters.");
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error ?? "Invalid email or password.");
+        setLoading(false);
+        return;
       }
-    }, 500);
+
+      router.push("/admin/dashboard");
+      router.refresh();
+    } catch {
+      setError("Something went wrong. Please try again.");
+      setLoading(false);
+    }
   }
 
   return (
@@ -55,14 +64,13 @@ export default function AdminLoginPage() {
       >
         {/* brand mark */}
         <div className="flex flex-col items-center mb-8">
-          <svg width="95" height="95" viewBox="0 0 48 48" fill="none" className="mb-4">
-         <image
-                  href="/Logos.png"
-                  x="0"
-                  y="0"
-                  width="48"
-                  height="48"
-                />
+          <svg width="52" height="52" viewBox="0 0 48 48" fill="none" className="mb-4">
+            <circle cx="24" cy="24" r="22" stroke="#FBBF24" strokeWidth="2" />
+            <circle cx="24" cy="24" r="16" fill="#1E3A8A" />
+            <path
+              d="M24 14 L27 21 L34 21 L28.5 25.5 L30.5 33 L24 28.5 L17.5 33 L19.5 25.5 L14 21 L21 21 Z"
+              fill="#FBBF24"
+            />
           </svg>
           <p className="text-white/60 text-[12px] font-semibold tracking-widest uppercase">MSU Naawan</p>
           <h1 className="font-display text-white text-2xl font-semibold mt-1 text-center">
@@ -155,9 +163,9 @@ export default function AdminLoginPage() {
         </div>
 
         <p className="text-center text-white/50 text-[12.5px] mt-6">
-          Having trouble signing in? Contact the IT officer at{" "}
-          <a href="mailto:tibong@msunaawan.edu.ph" className="text-white/80 underline">
-            tibongthegreat@msunaawan.edu.ph
+          Having trouble signing in? Contact the IT office at{" "}
+          <a href="mailto:it@msunaawan.edu.ph" className="text-white/80 underline">
+            it@msunaawan.edu.ph
           </a>
         </p>
       </motion.div>

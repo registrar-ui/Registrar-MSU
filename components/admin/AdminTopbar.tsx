@@ -1,15 +1,18 @@
 "use client";
 
 import { Menu, Bell, Search } from "lucide-react";
-import { getSession } from "@/lib/auth";
 import { useEffect, useState } from "react";
 
 export default function AdminTopbar({ onMenuClick }: { onMenuClick: () => void }) {
   const [email, setEmail] = useState<string>("");
 
   useEffect(() => {
-    const session = getSession();
-    if (session) setEmail(session.email);
+    fetch("/api/auth/session")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.email) setEmail(data.email);
+      })
+      .catch(() => {});
   }, []);
 
   const initials = email ? email.slice(0, 2).toUpperCase() : "AD";
