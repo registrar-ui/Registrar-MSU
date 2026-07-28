@@ -64,13 +64,14 @@ export default function AdminLoginPage() {
       >
         {/* brand mark */}
         <div className="flex flex-col items-center mb-8">
-          <svg width="52" height="52" viewBox="0 0 48 48" fill="none" className="mb-4">
-            <circle cx="24" cy="24" r="22" stroke="#FBBF24" strokeWidth="2" />
-            <circle cx="24" cy="24" r="16" fill="#1E3A8A" />
-            <path
-              d="M24 14 L27 21 L34 21 L28.5 25.5 L30.5 33 L24 28.5 L17.5 33 L19.5 25.5 L14 21 L21 21 Z"
-              fill="#FBBF24"
-            />
+           <svg width="50" height="50" viewBox="0 0 48 48" fill="none">
+              <image
+                  href="/Logos.png"
+                  x="0"
+                  y="0"
+                  width="48"
+                  height="48"
+                />
           </svg>
           <p className="text-white/60 text-[12px] font-semibold tracking-widest uppercase">MSU Naawan</p>
           <h1 className="font-display text-white text-2xl font-semibold mt-1 text-center">
@@ -163,9 +164,9 @@ export default function AdminLoginPage() {
         </div>
 
         <p className="text-center text-white/50 text-[12.5px] mt-6">
-          Having trouble signing in? Contact the IT office at{" "}
-          <a href="mailto:it@msunaawan.edu.ph" className="text-white/80 underline">
-            it@msunaawan.edu.ph
+          Having trouble signing in? Contact the IT officer at{" "}
+          <a href="mailto:tibongthegreat@msunaawan.edu.ph" className="text-white/80 underline">
+            tibongthegreat@msunaawan.edu.ph
           </a>
         </p>
       </motion.div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { Pencil, Trash2, ImageOff } from "lucide-react";
-import { type Announcement } from "@/lib/announcements";
+import { type Announcement } from "@/lib/types";
 
 export default function AnnouncementCard({
   item,
@@ -15,16 +15,16 @@ export default function AnnouncementCard({
   return (
     <div className="grad-border overflow-hidden">
       <div className="h-36 bg-mist flex items-center justify-center">
-        {item.imageDataUrl ? (
+        {item.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={item.imageDataUrl} alt={item.title} className="w-full h-full object-cover" />
+          <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
         ) : (
           <ImageOff size={26} className="text-ink-soft/40" />
         )}
       </div>
       <div className="p-5">
         <div className="flex items-center gap-3 text-[11.5px] text-ink-soft font-medium mb-2.5">
-          <span>{item.date}</span>
+         <span>{item.date.slice(0, 10)}</span>
           <span className="w-1 h-1 rounded-full bg-ink-soft" />
           <span className="text-gold-deep">{item.category}</span>
         </div>

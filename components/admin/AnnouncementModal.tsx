@@ -2,15 +2,16 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ImagePlus, Plus, Check } from "lucide-react";
-import { type Announcement, getCategories, addCategory } from "@/lib/announcements";
+import { X, ImagePlus, Check } from "lucide-react";
+import { type Announcement } from "@/lib/types";
 
 export type AnnouncementFormValues = {
   date: string;
   category: string;
   title: string;
   description: string;
-  imageDataUrl?: string;
+  imageFile?: File | null;
+  removeImage?: boolean;
 };
 
 export default function AnnouncementModal({
@@ -31,18 +32,27 @@ export default function AnnouncementModal({
   const [newCategory, setNewCategory] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [imageDataUrl, setImageDataUrl] = useState<string | undefined>(undefined);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [removeImage, setRemoveImage] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!open) return;
-    setCategories(getCategories());
-    setDate(initial?.date ?? new Date().toISOString().slice(0, 10));
+
+    fetch("/api/categories")
+      .then((res) => res.json())
+      .then(setCategories)
+      .catch(() => setCategories([]));
+
+    setDate(initial?.date?.slice(0, 10) ?? new Date().toISOString().slice(0, 10));
     setCategory(initial?.category ?? "");
     setTitle(initial?.title ?? "");
     setDescription(initial?.description ?? "");
-    setImageDataUrl(initial?.imageDataUrl);
+    setImageFile(null);
+    setPreviewUrl(initial?.imageUrl ?? null);
+    setRemoveImage(false);
     setAddingCategory(false);
     setNewCategory("");
     setErrors({});
@@ -51,15 +61,26 @@ export default function AnnouncementModal({
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setImageDataUrl(reader.result as string);
-    reader.readAsDataURL(file);
+    setImageFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+    setRemoveImage(false);
   }
 
-  function handleAddCategory() {
+  function handleRemoveImage() {
+    setImageFile(null);
+    setPreviewUrl(null);
+    setRemoveImage(true);
+  }
+
+  async function handleAddCategory() {
     const trimmed = newCategory.trim();
     if (!trimmed) return;
-    const updated = addCategory(trimmed);
+    const res = await fetch("/api/categories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: trimmed }),
+    });
+    const updated = await res.json();
     setCategories(updated);
     setCategory(trimmed);
     setNewCategory("");
@@ -79,7 +100,14 @@ export default function AnnouncementModal({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
-    onSave({ date, category, title: title.trim(), description: description.trim(), imageDataUrl });
+    onSave({
+      date,
+      category,
+      title: title.trim(),
+      description: description.trim(),
+      imageFile,
+      removeImage,
+    });
   }
 
   return (
@@ -117,7 +145,6 @@ export default function AnnouncementModal({
             </div>
 
             <form onSubmit={handleSubmit} className="px-7 py-6 space-y-5 max-h-[70vh] overflow-y-auto">
-              {/* date + category */}
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[13px] font-semibold text-ink mb-1.5">Date</label>
@@ -189,7 +216,6 @@ export default function AnnouncementModal({
                 </div>
               </div>
 
-              {/* title */}
               <div>
                 <label className="block text-[13px] font-semibold text-ink mb-1.5">Title</label>
                 <input
@@ -202,7 +228,6 @@ export default function AnnouncementModal({
                 {errors.title && <p className="text-[12px] text-red-600 mt-1">{errors.title}</p>}
               </div>
 
-              {/* description */}
               <div>
                 <label className="block text-[13px] font-semibold text-ink mb-1.5">Description</label>
                 <textarea
@@ -215,7 +240,6 @@ export default function AnnouncementModal({
                 {errors.description && <p className="text-[12px] text-red-600 mt-1">{errors.description}</p>}
               </div>
 
-              {/* image upload */}
               <div>
                 <label className="block text-[13px] font-semibold text-ink mb-1.5">Image (optional)</label>
                 <input
@@ -225,13 +249,13 @@ export default function AnnouncementModal({
                   onChange={handleImageChange}
                   className="hidden"
                 />
-                {imageDataUrl ? (
+                {previewUrl ? (
                   <div className="relative rounded-xl overflow-hidden h-40 group">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={imageDataUrl} alt="Preview" className="w-full h-full object-cover" />
+                    <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
                     <button
                       type="button"
-                      onClick={() => setImageDataUrl(undefined)}
+                      onClick={handleRemoveImage}
                       className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                       aria-label="Remove image"
                     >

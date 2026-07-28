@@ -2,23 +2,25 @@
 
 import { useEffect, useState } from "react";
 import { Plus, Megaphone } from "lucide-react";
-import {
-  type Announcement,
-  getAnnouncements,
-  addAnnouncement,
-  updateAnnouncement,
-  deleteAnnouncement,
-} from "@/lib/announcements";
+import { type Announcement } from "@/lib/types";
 import AnnouncementModal, { type AnnouncementFormValues } from "@/components/admin/AnnouncementModal";
 import AnnouncementCard from "@/components/admin/AnnouncementCard";
 
 export default function AdminAnnouncementsPage() {
   const [items, setItems] = useState<Announcement[]>([]);
+  const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Announcement | null>(null);
 
+  async function refresh() {
+    const res = await fetch("/api/announcements");
+    const data = await res.json();
+    setItems(data);
+    setLoading(false);
+  }
+
   useEffect(() => {
-    setItems(getAnnouncements());
+    refresh();
   }, []);
 
   function openCreate() {
@@ -31,20 +33,29 @@ export default function AdminAnnouncementsPage() {
     setModalOpen(true);
   }
 
-  function handleSave(values: AnnouncementFormValues) {
+  async function handleSave(values: AnnouncementFormValues) {
+    const formData = new FormData();
+    formData.set("date", values.date);
+    formData.set("category", values.category);
+    formData.set("title", values.title);
+    formData.set("description", values.description);
+    if (values.imageFile) formData.set("image", values.imageFile);
+    if (values.removeImage) formData.set("removeImage", "true");
+
     if (editing) {
-      updateAnnouncement(editing.id, values);
+      await fetch(`/api/announcements/${editing.id}`, { method: "PATCH", body: formData });
     } else {
-      addAnnouncement(values);
+      await fetch("/api/announcements", { method: "POST", body: formData });
     }
-    setItems(getAnnouncements());
+
     setModalOpen(false);
+    await refresh();
   }
 
-  function handleDelete(id: string) {
+  async function handleDelete(id: string) {
     if (!window.confirm("Delete this announcement? This cannot be undone.")) return;
-    deleteAnnouncement(id);
-    setItems(getAnnouncements());
+    await fetch(`/api/announcements/${id}`, { method: "DELETE" });
+    await refresh();
   }
 
   return (
@@ -53,9 +64,7 @@ export default function AdminAnnouncementsPage() {
         <div>
           <p className="text-[13px] font-semibold tracking-widest text-gold-deep uppercase mb-1">Announcements</p>
           <h1 className="font-display text-2xl sm:text-3xl font-semibold text-ink">Manage Announcements</h1>
-          <p className="text-ink-soft text-sm mt-1">
-            Stored locally for now — this will save to the database once it's connected.
-          </p>
+          <p className="text-ink-soft text-sm mt-1">Saved to the database — visible to everyone with access.</p>
         </div>
         <button
           onClick={openCreate}
@@ -65,7 +74,9 @@ export default function AdminAnnouncementsPage() {
         </button>
       </div>
 
-      {items.length === 0 ? (
+      {loading ? (
+        <p className="text-ink-soft text-sm">Loading announcements…</p>
+      ) : items.length === 0 ? (
         <div className="grad-border p-14 text-center">
           <div className="w-14 h-14 rounded-2xl bg-royal/10 flex items-center justify-center mx-auto mb-4">
             <Megaphone size={24} className="text-royal" />
