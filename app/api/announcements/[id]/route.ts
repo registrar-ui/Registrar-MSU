@@ -7,28 +7,18 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const { status, remarks } = await req.json();
+  const formData = await req.formData();
 
-  const data: { status?: string; remarks?: string | null } = {};
+  const date = formData.get("date") as string | null;
+  const category = formData.get("category") as string | null;
+  const title = formData.get("title") as string | null;
+  const description = formData.get("description") as string | null;
+  const imageFile = formData.get("image") as File | null;
+  const removeImage = formData.get("removeImage") === "true";
 
-  if (status !== undefined) {
-    if (!VALID_STATUSES.includes(status)) {
-      return NextResponse.json({ error: "Invalid status." }, { status: 400 });
-    }
-    data.status = status;
+  if (!date || !category || !title || !description) {
+    return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
   }
-
-  if (remarks !== undefined) {
-    data.remarks = remarks === "" ? null : remarks;
-  }
-
-  const updated = await prisma.documentRequest.update({
-    where: { id },
-    data,
-    include: { documentType: { select: { id: true, title: true, icon: true } } },
-  });
-  return NextResponse.json(updated);
-}
 
   const data: {
     date: Date;
