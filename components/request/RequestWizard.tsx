@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, Loader2, CheckCircle2, Copy } from "lucide-react";
-import { getDocumentBySlug } from "@/lib/documents";
+import { fetchDocumentType } from "@/lib/documents";
+import { DOCUMENT_ICON_MAP } from "@/lib/icons";
+import { type DocumentType } from "@/lib/types";
 import {
   createEmptyFormData,
   type RequestFormData,
@@ -76,11 +77,9 @@ function validateDelivery(d: DeliveryData): Errors {
 }
 
 export default function RequestWizard({ slug }: { slug: string }) {
-  const doc = getDocumentBySlug(slug);
-  if (!doc) notFound();
-
+  const [doc, setDoc] = useState<DocumentType | null | undefined>(undefined); // undefined = still loading
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState<RequestFormData>(() => createEmptyFormData(doc.title));
+  const [form, setForm] = useState<RequestFormData | null>(null);
   const [errors, setErrors] = useState<Errors>({});
   const [direction, setDirection] = useState(1);
   const [submitting, setSubmitting] = useState(false);
@@ -88,16 +87,25 @@ export default function RequestWizard({ slug }: { slug: string }) {
   const [referenceNumber, setReferenceNumber] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
+  useEffect(() => {
+    fetchDocumentType(slug).then((result) => {
+      setDoc(result);
+      if (result) setForm(createEmptyFormData(result.title));
+    });
+  }, [slug]);
+
   const patch = {
     identification: (p: Partial<IdentificationData>) =>
-      setForm((f) => ({ ...f, identification: { ...f.identification, ...p } })),
-    contact: (p: Partial<ContactData>) => setForm((f) => ({ ...f, contact: { ...f.contact, ...p } })),
+      setForm((f) => (f ? { ...f, identification: { ...f.identification, ...p } } : f)),
+    contact: (p: Partial<ContactData>) => setForm((f) => (f ? { ...f, contact: { ...f.contact, ...p } } : f)),
     document: (p: Partial<DocumentRequestData>) =>
-      setForm((f) => ({ ...f, document: { ...f.document, ...p } })),
-    delivery: (p: Partial<DeliveryData>) => setForm((f) => ({ ...f, delivery: { ...f.delivery, ...p } })),
+      setForm((f) => (f ? { ...f, document: { ...f.document, ...p } } : f)),
+    delivery: (p: Partial<DeliveryData>) =>
+      setForm((f) => (f ? { ...f, delivery: { ...f.delivery, ...p } } : f)),
   };
 
   function validateCurrentStep(): boolean {
+    if (!form) return false;
     let e: Errors = {};
     if (step === 1) e = validateIdentification(form.identification);
     if (step === 2) e = validateContact(form.contact);
@@ -121,17 +129,18 @@ export default function RequestWizard({ slug }: { slug: string }) {
   }
 
   async function handleSubmit() {
+    if (!form || !doc) return;
     setSubmitting(true);
     setSubmitError(null);
     try {
       const res = await fetch("/api/requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, documentTypeId: doc.id }),
       });
       if (!res.ok) throw new Error("Request failed");
       const data = await res.json();
-      setReferenceNumber(data.referenceNumber);
+      setReferenceNumber(data.reference);
     } catch {
       setSubmitError("Something went wrong submitting your request. Please try again.");
     } finally {
@@ -144,6 +153,29 @@ export default function RequestWizard({ slug }: { slug: string }) {
     center: { opacity: 1, x: 0 },
     exit: (dir: number) => ({ opacity: 0, x: dir > 0 ? -40 : 40 }),
   };
+
+  if (doc === undefined) {
+    return (
+      <div className="max-w-3xl mx-auto py-24 px-6 text-center">
+        <p className="text-[var(--color-ink-soft)] text-sm">Loading…</p>
+      </div>
+    );
+  }
+
+  if (doc === null) {
+    return (
+      <div className="max-w-lg mx-auto py-24 px-6 text-center">
+        <p className="font-semibold text-[var(--color-ink)] mb-4">This document type could not be found.</p>
+        <Link href="/" className="text-[var(--color-royal)] font-semibold text-sm">
+          ← Back to homepage
+        </Link>
+      </div>
+    );
+  }
+
+  if (!form) return null;
+
+  const documentIcon = DOCUMENT_ICON_MAP[doc.icon] ?? DOCUMENT_ICON_MAP.FileText;
 
   if (referenceNumber) {
     return (
@@ -225,7 +257,7 @@ export default function RequestWizard({ slug }: { slug: string }) {
                   data={form.document}
                   errors={errors}
                   onChange={patch.document}
-                  documentIcon={doc.icon}
+                  documentIcon={documentIcon}
                 />
               )}
               {step === 4 && <StepDelivery data={form.delivery} errors={errors} onChange={patch.delivery} />}

@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import Reveal from "./Reveal";
 import { type DocumentType } from "@/lib/types";
 import { DOCUMENT_ICON_MAP } from "@/lib/icons";
+
 
 export default function Services() {
   const [items, setItems] = useState<DocumentType[]>([]);
@@ -40,15 +42,18 @@ export default function Services() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {items.map((s, i) => {
                 const Icon = DOCUMENT_ICON_MAP[s.icon] ?? DOCUMENT_ICON_MAP.FileText;
-                return (
+              return (
                   <Reveal key={s.id} delay={(i % 4) * 0.08}>
-                    <div className="grad-border p-6 h-full hover:-translate-y-2 transition-transform duration-300">
+                    <Link
+                      href={`/request/${s.id}`}
+                      className="grad-border p-6 h-full block hover:-translate-y-2 transition-transform duration-300"
+                    >
                       <div className="w-12 h-12 rounded-2xl bg-royal/10 flex items-center justify-center mb-5">
                         <Icon size={22} className="text-royal" strokeWidth={1.8} />
                       </div>
                       <h3 className="font-semibold text-ink mb-1.5">{s.title}</h3>
                       <p className="text-[13.5px] text-ink-soft leading-relaxed">{s.description}</p>
-                    </div>
+                    </Link>
                   </Reveal>
                 );
               })}

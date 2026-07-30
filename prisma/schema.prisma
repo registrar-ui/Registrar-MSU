@@ -39,4 +39,30 @@ model DocumentType {
   order       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  requests DocumentRequest[]
+}
+
+enum RequestStatus {
+  PENDING
+  PROCESSING
+  READY_FOR_RELEASE
+  RELEASED
+  REJECTED
+}
+
+model DocumentRequest {
+  id             String        @id @default(cuid())
+  reference      String        @unique
+  documentTypeId String
+  documentType   DocumentType  @relation(fields: [documentTypeId], references: [id])
+  studentName    String
+  studentEmail   String
+  studentMobile  String
+  purpose        String
+  details        Json
+  status         RequestStatus @default(PENDING)
+  remarks        String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 }

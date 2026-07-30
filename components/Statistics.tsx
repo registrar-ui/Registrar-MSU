@@ -10,7 +10,7 @@ const STATS = [
 
 export default function Statistics() {
   return (
-    <section id="track" className="py-20 stats-bg relative overflow-hidden">
+   <section id="stats" className="py-20 stats-bg relative overflow-hidden">
       <svg className="absolute -right-10 -top-10 w-64 h-64 opacity-10" viewBox="0 0 200 200">
         <circle cx="100" cy="100" r="95" fill="none" stroke="#FBBF24" strokeWidth="2" strokeDasharray="3 8" />
       </svg>

@@ -1,20 +1,15 @@
-export type IdentificationMethod = "known" | "unknown";
-
-export type DeliveryMethod = "pickup" | "courier";
+export type IdentificationMethod = "known" | "unknown" | "";
 
 export interface IdentificationData {
-  method: IdentificationMethod | null;
-  // Option A — has student number
+  method: IdentificationMethod;
   studentNumber: string;
-  // Shared by both options
-  birthDate: string;
-  // Option B — no student number
   lastName: string;
   firstName: string;
   middleName: string;
   college: string;
   program: string;
   yearGraduatedOrLastAttended: string;
+  birthDate: string;
 }
 
 export interface ContactData {
@@ -29,8 +24,10 @@ export interface DocumentRequestData {
   specialInstructions: string;
 }
 
+export type DeliveryMethod = "pickup" | "courier" | "";
+
 export interface DeliveryData {
-  method: DeliveryMethod | null;
+  method: DeliveryMethod;
   receiverName: string;
   address: string;
   province: string;
@@ -46,37 +43,39 @@ export interface RequestFormData {
   delivery: DeliveryData;
 }
 
-export const createEmptyFormData = (documentType: string): RequestFormData => ({
-  identification: {
-    method: null,
-    studentNumber: "",
-    birthDate: "",
-    lastName: "",
-    firstName: "",
-    middleName: "",
-    college: "",
-    program: "",
-    yearGraduatedOrLastAttended: "",
-  },
-  contact: {
-    email: "",
-    mobile: "",
-  },
-  document: {
-    documentType,
-    purpose: "",
-    copies: 1,
-    specialInstructions: "",
-  },
-  delivery: {
-    method: null,
-    receiverName: "",
-    address: "",
-    province: "",
-    cityMunicipality: "",
-    zip: "",
-    contactNumber: "",
-  },
-});
+export function createEmptyFormData(documentTitle: string): RequestFormData {
+  return {
+    identification: {
+      method: "",
+      studentNumber: "",
+      lastName: "",
+      firstName: "",
+      middleName: "",
+      college: "",
+      program: "",
+      yearGraduatedOrLastAttended: "",
+      birthDate: "",
+    },
+    contact: {
+      email: "",
+      mobile: "",
+    },
+    document: {
+      documentType: documentTitle,
+      purpose: "",
+      copies: 1,
+      specialInstructions: "",
+    },
+    delivery: {
+      method: "",
+      receiverName: "",
+      address: "",
+      province: "",
+      cityMunicipality: "",
+      zip: "",
+      contactNumber: "",
+    },
+  };
+}
 
 export const STEP_LABELS = ["Identification", "Contact", "Document", "Delivery", "Review"] as const;

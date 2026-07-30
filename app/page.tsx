@@ -10,17 +10,20 @@ import Testimonials from "@/components/Testimonials";
 import FAQ from "@/components/FAQ";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
-
+import TrackRequest from "@/components/TrackRequest";
 export default function Home() {
   return (
     <main>
       <Navbar />
       <Hero />
+        <Announcements />
       <Services />
+   
       {/* <WhyChoose /> */}
       <Timeline />
+         <TrackRequest />
       {/* <Statistics /> */}
-      <Announcements />
+    
       {/* <DownloadCenter /> */}
       <Testimonials />
       <FAQ />

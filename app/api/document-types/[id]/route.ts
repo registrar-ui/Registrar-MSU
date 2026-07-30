@@ -26,3 +26,15 @@ export async function DELETE(
   await prisma.documentType.delete({ where: { id } });
   return NextResponse.json({ ok: true });
 }
+
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  const documentType = await prisma.documentType.findUnique({ where: { id } });
+  if (!documentType) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+  return NextResponse.json(documentType);
+}

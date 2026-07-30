@@ -7,11 +7,11 @@ import Image from "next/image";
 
 const LINKS = [
   { label: "Home", href: "#home" },
+  { label: "Announcements", href: "#announcements" },
   // { label: "About", href: "#about" },
   { label: "Services", href: "#services" },
   // { label: "Online Requests", href: "#requests" },
   // { label: "Download Forms", href: "#downloads" },
-  { label: "Announcements", href: "#announcements" },
   { label: "FAQs", href: "#faqs" },
   { label: "Contact", href: "#contact" },
 ];
