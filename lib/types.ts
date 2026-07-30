@@ -8,3 +8,12 @@ export type Announcement = {
   createdAt: string;
   updatedAt: string;
 };
+export type DocumentType = {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
+};

@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Megaphone,
+  Layers,
   FileText,
   Users,
   Settings,
@@ -15,6 +16,7 @@ import {
 const navItems = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
+  { href: "/admin/document-types", label: "Document Types", icon: Layers },
   { href: "/admin/requests", label: "Document Requests", icon: FileText },
   { href: "/admin/students", label: "Students", icon: Users },
   { href: "/admin/settings", label: "Settings", icon: Settings },

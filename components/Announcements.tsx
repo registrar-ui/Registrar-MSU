@@ -58,12 +58,10 @@ function AnnouncementCarousel({
   posts: Announcement[];
   onSelect: (index: number) => void;
 }) {
-  const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const [setWidth, setSetWidth] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const [isHovering, setIsHovering] = useState(false);
+  const suppressClickRef = useRef(false);
 
   // Render two identical copies back to back. Once the scroll position has
   // moved exactly one copy's width, we snap it back by that same width —
@@ -87,10 +85,8 @@ function AnnouncementCarousel({
   useAnimationFrame((_, delta) => {
     if (setWidth <= 0) return;
 
-    if (!isDragging && !isHovering) {
-      const speed = 26; // px per second — gentle drift
-      x.set(x.get() - speed * (delta / 1000));
-    }
+    const speed = 26; // px per second — gentle drift, never pauses
+    x.set(x.get() - speed * (delta / 1000));
 
     // Wrap-around runs every frame (autoplay AND drag) so it loops seamlessly
     // in either direction, no matter how it got near the edge.
@@ -102,11 +98,7 @@ function AnnouncementCarousel({
   });
 
   return (
-    <div
-      ref={containerRef}
-      className="overflow-hidden"
-    
-    >
+    <div className="overflow-hidden">
       <motion.div
         ref={trackRef}
         className="flex gap-8 w-max"
@@ -114,8 +106,14 @@ function AnnouncementCarousel({
         drag={canLoop ? "x" : false}
         dragElastic={0.02}
         dragMomentum={false}
-        onDragStart={() => setIsDragging(true)}
-        onDragEnd={() => setIsDragging(false)}
+        onDragStart={() => {
+          suppressClickRef.current = false;
+        }}
+        onDrag={(_, info) => {
+          // Once the pointer has moved more than a few pixels, treat this as
+          // a real drag rather than a tap, and swallow the click that follows.
+          if (Math.abs(info.offset.x) > 6) suppressClickRef.current = true;
+        }}
       >
         {items.map((p, i) => {
           const style = CATEGORY_STYLES[p.category] ?? DEFAULT_STYLE;
@@ -127,7 +125,13 @@ function AnnouncementCarousel({
               role="button"
               tabIndex={0}
               aria-label={`Read more: ${p.title}`}
-              onClick={() => onSelect(i % posts.length)}
+              onClick={() => {
+                if (suppressClickRef.current) {
+                  suppressClickRef.current = false;
+                  return;
+                }
+                onSelect(i % posts.length);
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();

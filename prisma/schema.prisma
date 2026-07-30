@@ -3,11 +3,7 @@ generator client {
 }
 
 datasource db {
-  // SQLite for local dev — zero setup, just a file on disk.
-  // To move to Postgres later: change provider to "postgresql" and
-  // set DATABASE_URL to your Postgres connection string. No other
-  // code in the app needs to change.
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -33,4 +29,14 @@ model Announcement {
 model Category {
   id   String @id @default(cuid())
   name String @unique
+}
+
+model DocumentType {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  icon        String   @default("FileText")
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
