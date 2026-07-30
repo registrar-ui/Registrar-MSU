@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { type DocumentRequest, type RequestStatus } from "@/lib/types";
 
@@ -108,8 +108,8 @@ export default function AdminRequestsPage() {
                   const idf = r.details?.identification;
                   const del = r.details?.delivery;
                   return (
-                    <>
-                      <tr key={r.id} className="border-t border-slate-100 text-[13.5px] align-top">
+                    <React.Fragment key={r.id}>
+                      <tr className="border-t border-slate-100 text-[13.5px] align-top">
                         <td className="px-6 py-4 font-mono text-ink-soft whitespace-nowrap">{r.reference}</td>
                         <td className="px-6 py-4">
                           <p className="font-medium text-ink">{r.studentName}</p>
@@ -147,7 +147,7 @@ export default function AdminRequestsPage() {
                         </td>
                       </tr>
                       {expanded && (
-                        <tr key={`${r.id}-details`} className="border-t border-slate-100 bg-mist/60">
+                        <tr className="border-t border-slate-100 bg-mist/60">
                           <td colSpan={6} className="px-6 py-4">
                             <div className="grid sm:grid-cols-2 gap-4 mb-4 text-[12.5px]">
                               <div>
@@ -206,7 +206,7 @@ export default function AdminRequestsPage() {
                           </td>
                         </tr>
                       )}
-                    </>
+                    </React.Fragment>
                   );
                 })}
               </tbody>
