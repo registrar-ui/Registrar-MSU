@@ -6,7 +6,7 @@ export default function Footer() {
       <svg className="absolute -left-16 -bottom-16 w-72 h-72 opacity-[0.06]" viewBox="0 0 200 200">
         <circle cx="100" cy="100" r="95" fill="none" stroke="#FBBF24" strokeWidth="2" strokeDasharray="3 8" />
       </svg>
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-10 relative">
+      <div className="max-w-7xl mx-auto px-6 lg:px-10 grid sm:grid-cols-2 lg:grid-cols-5 gap-10 relative">
         <div>
           <div className="flex items-center gap-3 mb-4">
             <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
@@ -61,7 +61,26 @@ export default function Footer() {
             </a>
           </div>
         </div>
+
+         <div>
+          <p className="font-semibold text-white mb-4 text-sm">Developer</p>
+          <ul className="space-y-2.5 text-sm">
+            <li>Kent Remar L. Cuñado</li>
+          
+          </ul>
+          <div className="flex gap-3 mt-4">
+            <a
+              href="#"
+              className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-[var(--color-gold)] hover:text-[var(--color-royal-deep)] transition-colors"
+            >
+              <Facebook size={16} />
+            </a>
+          </div>
+        </div>
+
       </div>
+      
+      
 
       <div className="max-w-7xl mx-auto px-6 lg:px-10 mt-12 pt-6 border-t border-white/10 text-xs text-white/50 text-center">
         © 2026 Office of the University Registrar, Mindanao State University at Naawan. All rights reserved.
